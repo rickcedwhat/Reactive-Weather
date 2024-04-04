@@ -1,25 +1,56 @@
 import React, { useState } from "react";
 import WeatherCard from "./components/WeatherCard.js";
-import cities from "./data.js";
-import Location from "./components/Location.js";
+import data from "./data.js";
+import CurrentLocation from "./components/CurrentLocation.js";
 import Form from "./components/Form.js";
-import { Stack } from "@mui/material";
+import { Stack, Button, TextField } from "@mui/material";
 
 function App() {
+  const cities = data
+    .map(({ city }) => city)
+    .sort((a, b) => a.localeCompare(b));
+  const [allCities, setAllCities] = useState(cities);
   const [location, setLocation] = useState(cities[0]);
-  cities.sort((a, b) => a.city.localeCompare(b.city));
+  const [newCity, setNewCity] = useState("");
+
+  const onChange = (e) => {
+    setNewCity(e.target.value);
+  };
+
+  const onClick = () => {
+    setAllCities([...allCities, newCity]);
+    setNewCity("");
+    setLocation(newCity);
+  };
+
   return (
     <Stack spacing={2} direction="column" alignItems="center">
       <h1 className="title">REACTIVE WEATHER</h1>
       <h3 className="subtitle">Up to the minute weather news</h3>
-      <Form location={location} setLocation={setLocation} options={cities} />
+      {/* <Form location={location} setLocation={setLocation} options={cities} /> */}
+      <Stack spacing={2} direction="row" alignItems="center">
+        <TextField
+          label="City Name"
+          value={newCity}
+          onChange={onChange}
+          variant="outlined"
+        />
+        <Button onClick={onClick}>Search</Button>
+      </Stack>
       <div className="app">
-        <Location data={cities} location={location} setLocation={setLocation} />
-        {cities
-          .filter(({ city }) => city !== location.city)
-          .map((city) => (
-            <WeatherCard key={city.city} data={city} />
-          ))}
+        <CurrentLocation city={location} />
+        {cities.map((city) => {
+          if (city === location) {
+            return null;
+          }
+          return (
+            <WeatherCard
+              key={city.city}
+              city={city}
+              setCurrentLocation={setLocation}
+            />
+          );
+        })}
       </div>
     </Stack>
   );
