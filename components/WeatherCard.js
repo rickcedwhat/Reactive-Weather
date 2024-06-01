@@ -43,14 +43,16 @@ function WeatherCard({ isCurrentLocation, city, setCurrentLocation }) {
       const response = await fetch(
         `https://api.tomorrow.io/v4/weather/realtime?location=${city}&apikey=${process.env.REACT_APP_TOMORROW_API_KEY}&units=imperial`
       );
-      const data = await response.json();
-      const { temperature: temp, weatherCode: wc } = data?.data?.values || {
-        temp: 75,
-        wc: 1000,
-      };
-      console.log({ temp, wc, data });
-      setTemperature(Math.round(temp, 0));
-      setWeatherCode(wc);
+      if (response.ok) {
+        const data = await response.json();
+        const { temperature: temp, weatherCode: wc } = data?.data?.values || {
+          temp: 75,
+          wc: 1000,
+        };
+        console.log({ temp, wc, data });
+        setTemperature(Math.round(temp, 0));
+        setWeatherCode(wc);
+      }
     };
     getWeather();
   }, []);
